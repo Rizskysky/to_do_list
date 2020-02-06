@@ -18,7 +18,7 @@ func main() {
 		fmt.Println("status: ", err)
 	}
 	defer db.DB.Close()
-	db.DB.AutoMigrate(&models.ToDo{})
+	db.DB.AutoMigrate(&models.ToDo{}, &models.Users{})
 	r := routes.SetupRouter()
 	//running server
 	r.Run()

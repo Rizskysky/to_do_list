@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
 	"to_do_list/module/todo/handlers"
+
+	"github.com/gin-gonic/gin"
 )
 
 //SetupRouter untuk setup routernya bro
