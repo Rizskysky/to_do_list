@@ -4,11 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
 )
-
-var DB *gorm.DB
 
 //DBconfig :nodoc:
 type DBconfig struct {
@@ -51,7 +48,7 @@ func BuildDbConfig() *DBconfig {
 }
 
 //DbURL :nodoc:
-func DbURL(DBconfig *DBconfig) string {
+func MysqlConnURL(DBconfig *DBconfig) string {
 	return fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		DBconfig.User,

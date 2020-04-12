@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"to_do_list/module/todo/models"
 	"to_do_list/module/todo/repositories"
@@ -8,9 +9,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type todoHandler struct {
+	todoRepo repositories.Todo
+}
+
+func TodoHandler(todo repositories.Todo) *todoHandler {
+	return &todoHandler{
+		todoRepo: todo,
+	}
+
+}
+
 // GetTodos :nodoc:
-func GetTodos(c *gin.Context) {
-	todo, err := repositories.GetAllTodo()
+func (handler *todoHandler) GetTodos(c *gin.Context) {
+	todo, err := handler.todoRepo.GetAllTodo()
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {
@@ -19,9 +31,9 @@ func GetTodos(c *gin.Context) {
 }
 
 // GetATodo :nodoc:
-func GetATodo(c *gin.Context) {
+func (handler *todoHandler) GetATodo(c *gin.Context) {
 	id := c.Params.ByName("id")
-	todo, err := repositories.GetATodo(id)
+	todo, err := handler.todoRepo.GetATodo(id)
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {
@@ -30,14 +42,18 @@ func GetATodo(c *gin.Context) {
 }
 
 // CreateTodo :nodoc:
-func CreateTodo(c *gin.Context) {
+func (handler *todoHandler) CreateTodo(c *gin.Context) {
 	var todo models.ToDo
-	err := c.BindJSON(&todo)
+	requestPayload := make(map[string]interface{})
+
+	err := c.BindJSON(&requestPayload)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
-	todo, err = repositories.CreateATodo(todo)
+
+	fmt.Println(requestPayload)
+	todo, err = handler.todoRepo.CreateATodo(todo)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 	} else {
@@ -46,16 +62,16 @@ func CreateTodo(c *gin.Context) {
 }
 
 // EditTodo :nodoc:
-func EditTodo(c *gin.Context) {
+func (handler *todoHandler) EditTodo(c *gin.Context) {
 	var todo models.ToDo
 	id := c.Params.ByName("id")
-	todo, err := repositories.GetATodo(id)
+	todo, err := handler.todoRepo.GetATodo(id)
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
 	c.BindJSON(&todo)
-	todo, err = repositories.UpdateTodo(todo, id)
+	todo, err = handler.todoRepo.UpdateTodo(todo, id)
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {
@@ -64,10 +80,10 @@ func EditTodo(c *gin.Context) {
 }
 
 // DeleteTodo :nodoc:
-func DeleteTodo(c *gin.Context) {
+func (handler *todoHandler) DeleteTodo(c *gin.Context) {
 	var todo models.ToDo
 	id := c.Params.ByName("id")
-	todo, err := repositories.DeleteTodo(todo, id)
+	todo, err := handler.todoRepo.DeleteTodo(todo, id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, err)
 	} else {
